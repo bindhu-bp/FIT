@@ -1,0 +1,4 @@
+PyMySQL
+fastapi
+mangum
+python-dotenv

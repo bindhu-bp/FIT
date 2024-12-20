@@ -1,0 +1,84 @@
+service: fitness-tracker
+
+plugins:
+  - serverless-python-requirements
+  - serverless-dotenv-plugin
+
+provider:
+  name: aws
+  runtime: python3.12
+  region: us-east-1
+  environment:
+    MYSQL_HOST: ${env:MYSQL_HOST}
+    MYSQL_USER: ${env:MYSQL_USER}
+    MYSQL_PASSWORD: ${env:MYSQL_PASSWORD}
+    MYSQL_DB: ${env:MYSQL_DB}
+
+functions:
+  auth:
+    handler: src.lambdas.auth.handler
+    events:
+      - http:
+          path: /login
+          method: post
+          cors: true
+      - http:
+          path: /signup
+          method: post
+          cors: true
+
+  profile:
+    handler: src.lambdas.profile.handler
+    events:
+      - http:
+          path: /getUserProfile
+          method: post
+          cors: true
+      - http:
+          path: /updateUserProfile
+          method: post
+          cors: true
+
+  steps:
+    handler: src.lambdas.steps.handler
+    events:
+      - http:
+          path: /updateStepCount
+          method: post
+          cors: true
+      - http:
+          path: /buttonAverage
+          method: post
+          cors: true
+      - http:
+          path: /buttonTotal
+          method: post
+          cors: true
+
+  leaderboard:
+    handler: src.lambdas.leaderboard.handler
+    events:
+      - http:
+          path: /leaderboardDaily
+          method: get
+          cors: true
+      - http:
+          path: /leaderboardWeekly
+          method: get
+          cors: true
+      - http:
+          path: /dashboard
+          method: get
+          cors: true
+
+custom:
+  pythonRequirements:
+    dockerizePip: true
+    layer:
+      name: python-deps
+      description: Python dependencies
+    zip: true
+
+  package:
+    include:
+      - src/lambdas/**
